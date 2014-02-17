@@ -1,8 +1,9 @@
 # ProcessLock
 
 A simple class to acquire and check process-id file based locks on a unix filesystem.
+Can also be used to see if a process is already running or designate a master process when running concurrent applications.
 
-[![Build Status](https://travis-ci.org/ianheggie/ruby-process-lock.png?branch=master)](https://travis-ci.org/ianheggie/ruby-process-lock)
+[![Build Status](https://travis-ci.org/ianheggie/process_lock.png?branch=master)](https://travis-ci.org/ianheggie/process_lock)
 
 ## Installation
 
@@ -21,7 +22,7 @@ Or install it yourself as:
 ## Usage
 
 Create an instance of ProcessLock with a filename as the lock.
-You may have more than one lock per process.
+You may have more than one lock (with different names) per process.
 
 Methods:
 * acquire - Acquires a lock if it can. Returns true (or value of block if block is passed) if a lock was acquired, otherwise false.
@@ -33,11 +34,11 @@ Methods:
 
 Note:
 * locks don't stack - if we have already acquired the lock subsequent calls will reacquire the lock. releasing an already released lock will fail.
-* If Rails.root is defined then lock files will be put in tmp/pids, and have .pid appended if no extension is specified
+* If Rails.root is defined then lock files without path separators (/) will be put in tmp/pids. If no extension is specified then .pid will be appended.
 
 To acquire a lock, do some work and then release it:
 
-    pl = ProcessLock.new('tmp/name_of_lock.pid')
+    pl = ProcessLock.new('tmp/name_of_lock.lock')
 
     acquired = pl.acquire do
       puts "Do some work!"
@@ -53,74 +54,23 @@ To acquire a lock, do some work and then release it:
     puts "Do some work!"
     pl.release
 
+To allow many worker processes to self organise and identify a leader process. (Simon and my implementation have diverged).
 
-Example:
-
-irb - run first
-
-    >> require 'process_lock'
+    IRB 1>>
+    pl = ProcessLock.new('example.tmp')
+    pl.acquire
     => true
-    >> Process.pid
-    => 16568
-    >> p = ProcessLock.new('tmp/example.tmp')
-    => #<ProcessLock:0x00000001489c10 @filename="tmp/example.tmp">
-    >> p.alive?
+    pl.read
+    => "2435"
+
+    IRB 2>>
+    pl = ProcessLock.new('example.tmp')
+    pl.acquire
     => false
-    >> p.owner?
-    => false
-    >> p.read
-    => 0
+    pl.read
+    => "2435"
 
-    >> p.acquire!
-    => true
-
-    >> p.alive?
-    => true
-    >> p.owner?
-    => true
-    >> p.read
-    => 16568
-    >> sleep(10)
-    => 10
-    >> p.release!
-    => true
-    >> p.alive?
-    => false
-    >> p.owner?
-    => false
-    >> p.read
-    => 0
-
-2nd irb, run after first has acquired the lock
-
-    >> require 'process_lock'
-    => true
-    >> Process.pid
-    => 16569
-    >> q = ProcessLock.new('tmp/example.tmp')
-    => #<ProcessLock:0x000000026e4090 @filename="tmp/example.tmp">
-    >> q.alive?
-    => true
-    >> q.owner?
-    => false
-    >> q.read
-    => 16568
-
-    >> q.acquire!
-    ProcessLock::AlreadyLocked: Unable to acquire lock
-            from /home/ianh/Projects/Github/ruby-process-lock/lib/process_lock.rb:28:in `acquire!'
-            from (irb):7
-            from /home/ianh/.rbenv/versions/1.9.3-p484/bin/irb:12:in `<main>'
-
-    >> q.alive?
-    => true
-    >> q.owner?
-    => false
-    >> q.read
-    => 16568
-    >>
-
-example.tmp will contain the pid of the running process
+example.tmp will contain the pid of the leader process
 
 ## Contributing
 
@@ -132,7 +82,7 @@ example.tmp will contain the pid of the running process
 
 ## License and contributions
 
-* Based on work Copyright (c) 2008 Simon Engledew, released under the MIT license.
-* Subsequent work by Ian Heggie: packaged into a gem, added tests and acquire method, fixed acquire so it didn't overwrite locks by other processes.
+* Copyright (c) 2008 Simon Engledew, released under the MIT license: https://github.com/simon-engledew/ruby-process-lock .
+* Subsequent work by Ian Heggie: packaged into a gem, added tests and acquire method, fixed some bugs.
 * See git log for other contributers
 

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["ian@heggie.biz"]
   spec.description   = %q{A simple class to aquire and check process-id file based locks on a unix filesystem.}
   spec.summary       = %q{Use process lock to see if a process is already running or designate a master process when running concurrent applications.}
-  spec.homepage      = "https://github.com/ianheggie/ruby-process-lock"
+  spec.homepage      = "https://github.com/ianheggie/process_lock"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)

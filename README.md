@@ -78,11 +78,11 @@ example.tmp will contain the pid of the leader process
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+5. Create new Pull Request (Tests appreciated)
 
 ## License and contributions
 
 * Copyright (c) 2008 Simon Engledew, released under the MIT license: https://github.com/simon-engledew/ruby-process-lock .
-* Subsequent work by Ian Heggie: packaged into a gem, added tests and acquire method, fixed some bugs.
+* Subsequent work by Ian Heggie: enhanced library and packaged into a gem, added tests and acquire method, fixed some bugs.
 * See git log for other contributers
 
